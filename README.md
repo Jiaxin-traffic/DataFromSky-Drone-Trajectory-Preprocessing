@@ -168,19 +168,19 @@ After defining the polynomial reference line, the program samples points along t
 
 The output CSV file contains the processed highway vehicle trajectory data in Frenet coordinates. Each row represents one vehicle at one timestamp.
 
-| Column     | Description                                                                                                                  |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Track ID` | Unique vehicle trajectory ID.                                                                                                |
-| `Type`     | Vehicle type exported from DataFromSky.                                                                                      |
-| `Time [s]` | Timestamp of the trajectory point, in seconds.                                                                               |
-| `s`        | Longitudinal Frenet position along the reference line, converted from pixels to meters.                                      |
-| `s_dot`    | Longitudinal velocity in the Frenet coordinate system, in meters per second.                                                 |
-| `s_ddot`   | Longitudinal acceleration in the Frenet coordinate system, in meters per second squared.                                     |
-| `d`        | Lateral Frenet offset from the reference line, converted from pixels to meters.                                              |
-| `d_dot`    | Lateral velocity in the Frenet coordinate system, in meters per second.                                                      |
-| `d_ddot`   | Lateral acceleration in the Frenet coordinate system, in meters per second squared.                                          |
-| `d_theta`  | Heading angle difference between the vehicle movement direction and the tangent direction of the reference line, in radians. |
-| `dt_ds`    | Approximate lateral slope with respect to the longitudinal Frenet distance.                                                  |
+| Output Column | Description |
+| ------------- | ----------- |
+| `Track ID` | Unique vehicle trajectory ID. |
+| `Type` | Vehicle type exported from DataFromSky. |
+| `Time [s]` | Timestamp of the trajectory point, in seconds. |
+| `s` | Longitudinal Frenet position along the reference line, converted from pixels to meters. |
+| `s_dot` | Longitudinal velocity in the Frenet coordinate system, in meters per second. |
+| `s_ddot` | Longitudinal acceleration in the Frenet coordinate system, in meters per second squared. |
+| `d` | Lateral Frenet offset from the reference line, converted from pixels to meters. |
+| `d_dot` | Lateral velocity in the Frenet coordinate system, in meters per second. |
+| `d_ddot` | Lateral acceleration in the Frenet coordinate system, in meters per second squared. |
+| `d_theta` | Heading angle difference between the vehicle movement direction and the tangent direction of the reference line, in radians. |
+| `dt_ds` | Approximate lateral slope with respect to the longitudinal Frenet distance. |
 
 ### 📏 Unit Correction
 
