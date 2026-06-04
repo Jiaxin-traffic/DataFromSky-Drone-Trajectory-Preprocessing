@@ -17,6 +17,17 @@ The pipeline performs the following steps:
 9. Converts pixel-based values to metric units.
 10. Exports selected Frenet features to CSV.
 
+
+## 📌 Assumption
+
+<p align="center">
+  <img src="./DataFromSky_Coordinate.png" width="900">
+</p>
+
+The coordinate transformation in this tool is based on the coordinate system shown in the figure above. The original Cartesian coordinates are obtained from DataFromSky, and the Frenet coordinate system is defined along the vehicle driving direction on the highway.
+
+The longitudinal coordinate follows the highway driving direction, while the lateral coordinate describes the vehicle offset from the road reference line. If the road direction, camera angle, or coordinate orientation differs from this example, the reference line and coordinate direction should be adjusted according to the actual scene. The transformation method itself remains unchanged.
+
 ## 📥 Input Data Format
 
 The input CSV file is expected to be exported from **DataFromSky** and separated by semicolons (`;`).
