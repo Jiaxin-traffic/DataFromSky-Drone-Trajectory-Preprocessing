@@ -40,6 +40,7 @@ The first eight columns contain vehicle-level metadata, including vehicle ID, ve
 | `Traveled Dist. [px]` | Traveled distance in image pixels              |
 | `Avg. Speed [kpx/h]`  | Average speed in image-based units             |
 
+
 ### 📍 Trajectory Sequence
 
 The trajectory sequence starts from the **9th column**. Each trajectory frame contains five values:
