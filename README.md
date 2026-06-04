@@ -62,8 +62,9 @@ In the current preprocessing procedure, only the image coordinates and time valu
 ```text
 x [px]; y [px]; time [s]
 ```
-The Frenet coordinate transformation is implemented based on the method proposed by Werling et al. in Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame.
+The Frenet coordinate transformation is implemented based on the method proposed by Werling et al. in [*Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame*](https://www.semanticscholar.org/paper/Optimal-trajectory-generation-for-dynamic-street-in-Werling-Ziegler/6bda8fc13bda8cffb3bb426a73ce5c12cc0a1760)
 The speed and acceleration values exported by DataFromSky are not directly used in the Frenet transformation step.
+
 
 ### ✅ Output Purpose
 
