@@ -91,6 +91,7 @@ process_raw_to_frenet_csv(
     smooth=True,
     kalman_r=KALMAN_R,
     kalman_q=KALMAN_Q,
+    trim_edge_seconds=TRIM_EDGE_SECONDS
 )
 ```
 
@@ -115,8 +116,11 @@ process_raw_to_frenet_csv(
 | `smooth`          | If `True`, applies Kalman smoothing to selected trajectory variables.                            |
 | `kalman_r`        | Measurement noise parameter of the Kalman filter. A larger value produces stronger smoothing.    |
 | `kalman_q`        | Process noise parameter of the Kalman filter. A larger value allows faster motion-state changes. |
+| `trim_edge_seconds`| Optional time window removed from the beginning and end of each vehicle trajectory before Frenet computation. |
+
 
 ## 🛣️ Reference Line Hyperparameters
+
 
 The reference line is used to define the highway Frenet coordinate system. The polynomial coefficients are stored in `REFERENCE_LINE`, while the sampling range and resolution are controlled by the following hyperparameters:
 
