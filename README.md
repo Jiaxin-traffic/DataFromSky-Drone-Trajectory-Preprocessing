@@ -72,15 +72,17 @@ The main function for trajectory preprocessing is `process_raw_to_frenet_csv()`.
 This function reads the raw semicolon-separated trajectory CSV exported from **DataFromSky**, filters and smooths the trajectory data, transforms image coordinates into highway Frenet coordinates, and saves the processed results as a new CSV file.
 
 ```python
+
 process_raw_to_frenet_csv(
     input_file,
     output_file,
     max_rows=None,
-    y_min=1333,
-    y_max=1422,
-    time_interval=0.1,
+    y_min=Y_MIN,
+    y_max=Y_MAX,
+    time_interval=TIME_INTERVAL,
     time_atol=1e-6,
-    reference_line=REFERENCE_LINE,
+    reference_degree=REFERENCE_DEGREE,
+    reference_coefficients=REFERENCE_COEFFICIENTS,
     reference_x_min=REFERENCE_X_MIN,
     reference_x_max=REFERENCE_X_MAX,
     reference_num=REFERENCE_NUM,
@@ -103,10 +105,11 @@ process_raw_to_frenet_csv(
 | `y_max`           | Upper bound for filtering vehicles based on the first-frame image `y` coordinate.                |
 | `time_interval`   | Sampling interval in seconds. Use `None` or `<= 0` to keep all frames.                           |
 | `time_atol`       | Absolute tolerance used when matching the desired sampling interval.                             |
-| `reference_line`  | Polynomial coefficients of the highway reference line, ordered for `numpy.polyval`.              |
-| `reference_x_min` | Minimum `x` value used to sample the reference line.                                             |
-| `reference_x_max` | Maximum `x` value used to sample the reference line.                                             |
-| `reference_num`   | Number of sampled points used to construct the reference line.                                   |
+| `reference_degree` | Degree of the polynomial reference line.                                                        |
+| `reference_coefficients` | Polynomial coefficients of the reference line, ordered for `numpy.polyval`. The length must be `reference_degree + 1`. |
+| `reference_x_min` | Starting `x` coordinate of the reference line segment in the image coordinate system.            |
+| `reference_x_max` | Ending `x` coordinate of the reference line segment in the image coordinate system.              |
+| `reference_num`   | Number of points sampled along the reference line segment.                                       |
 | `reverse_s`       | If `True`, reverses the longitudinal Frenet coordinate direction.                                |
 | `flip_d`          | If `True`, flips the sign of the lateral Frenet coordinate.                                      |
 | `smooth`          | If `True`, applies Kalman smoothing to selected trajectory variables.                            |
@@ -118,9 +121,9 @@ process_raw_to_frenet_csv(
 The reference line is used to define the highway Frenet coordinate system. The polynomial coefficients are stored in `REFERENCE_LINE`, while the sampling range and resolution are controlled by the following hyperparameters:
 
 ```python
-REFERENCE_X_MIN = 0.0
-REFERENCE_X_MAX = 4000.0
-REFERENCE_NUM = 4000
+REFERENCE_X_MIN = X_MIN
+REFERENCE_X_MAX = X_MAX
+REFERENCE_NUM = NUM_POINTS
 ```
 
 These hyperparameters define the longitudinal sampling range and resolution of the highway reference line. They can be adjusted according to the length and geometry of different highway sections.
@@ -130,14 +133,68 @@ These hyperparameters define the longitudinal sampling range and resolution of t
 Kalman smoothing is controlled by two hyperparameters:
 
 ```python
-KALMAN_R = 0.001
-KALMAN_Q = 0.05
+KALMAN_R = KALMAN_R
+KALMAN_Q = KALMAN_Q
 ```
 
 `KALMAN_R` represents the measurement noise, which controls the reliability of the observed trajectory data. A larger value means the filter trusts the raw observations less and produces stronger smoothing.
-
 `KALMAN_Q` represents the process noise, which controls the allowed variation of vehicle motion states. A larger value allows the trajectory state to change more quickly.
 
-## ✅ Output
+## 🛣️ Reference Line
 
-The function generates a processed CSV file containing standardized highway vehicle trajectory data in Frenet coordinates. The output can be used for traffic flow analysis, vehicle interaction analysis, lane-changing behavior analysis, and traffic safety evaluation.
+The reference line is used to define the Frenet coordinate system for the highway section. In this program, the road boundary or lane reference line is represented by a polynomial:
+
+```python
+y = np.polyval(reference_line, x)
+```
+
+The polynomial coefficients are stored in `REFERENCE_LINE` and can be replaced for different work zones or road sections. The reference line can be fitted using a polynomial of any order. Higher-order polynomials can better describe curved or irregular road boundaries, while lower-order polynomials are suitable for straight or slightly curved highway sections.
+
+The coefficients should follow the input format of `numpy.polyval`, ordered from the highest-order term to the constant term:
+
+```python
+REFERENCE_LINE = [
+    coefficient_n,
+    coefficient_n_minus_1,
+    ...,
+    coefficient_1,
+    coefficient_0,
+]
+```
+
+After defining the polynomial reference line, the program samples points along the selected reference line segment and uses them to transform vehicle positions from image coordinates into Frenet coordinates.
+
+## 📤 Output Columns
+
+The output CSV file contains the processed highway vehicle trajectory data in Frenet coordinates. Each row represents one vehicle at one timestamp.
+
+| Column     | Description                                                                                                                  |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `Track ID` | Unique vehicle trajectory ID.                                                                                                |
+| `Type`     | Vehicle type exported from DataFromSky.                                                                                      |
+| `Time [s]` | Timestamp of the trajectory point, in seconds.                                                                               |
+| `s`        | Longitudinal Frenet position along the reference line, converted from pixels to meters.                                      |
+| `s_dot`    | Longitudinal velocity in the Frenet coordinate system, in meters per second.                                                 |
+| `s_ddot`   | Longitudinal acceleration in the Frenet coordinate system, in meters per second squared.                                     |
+| `d`        | Lateral Frenet offset from the reference line, converted from pixels to meters.                                              |
+| `d_dot`    | Lateral velocity in the Frenet coordinate system, in meters per second.                                                      |
+| `d_ddot`   | Lateral acceleration in the Frenet coordinate system, in meters per second squared.                                          |
+| `d_theta`  | Heading angle difference between the vehicle movement direction and the tangent direction of the reference line, in radians. |
+| `dt_ds`    | Approximate lateral slope with respect to the longitudinal Frenet distance.                                                  |
+
+### 📏 Unit Correction
+
+The Frenet position, velocity, and acceleration variables are converted from image-based pixel units into real-world metric units. The trajectory data exported from DataFromSky are initially represented in image-based pixel units. To convert them into real-world metric units, a pixel-to-meter scale factor is calculated using known highway geometric dimensions. In the software, two lane marking lines are selected as calibration reference. The pixel distance between these two lines is measured from the image. Since the actual lane width can be determined according to highway design specifications, the real-world distance between the selected lane lines can be calculated.
+
+## 📄 Example Output
+
+The processed output CSV contains one row for each vehicle at each timestamp.  
+An example output is shown below:
+
+| Track ID | Type | Time [s] | s | s_dot | s_ddot | d | d_dot | d_ddot | d_theta | dt_ds |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 10 | Car | 0.6 | 74.710 | 26.159 | 0.487 | 1.994 | 0.035 | 0.122 | 0.00132 | 0.00132 |
+| 10 | Car | 0.7 | 77.354 | 26.208 | 0.491 | 1.997 | 0.035 | 0.006 | 0.00134 | 0.00134 |
+| 10 | Car | 0.8 | 79.965 | 26.342 | 1.338 | 2.000 | 0.038 | 0.024 | 0.00142 | 0.00143 |
+
+In this example, the same `Track ID` appears at multiple timestamps, representing the continuous trajectory of the same vehicle in the Frenet coordinate system.
