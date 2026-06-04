@@ -2,7 +2,7 @@
 
 This script converts raw vehicle trajectory data into Frenet-coordinate features along a fitted reference line. It is designed for semicolon-separated trajectory files where each vehicle trajectory is stored as one long row.
 
-## What The Code Does
+🔧 ## What The Code Does
 
 The pipeline performs the following steps:
 
