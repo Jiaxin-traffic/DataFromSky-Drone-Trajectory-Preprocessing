@@ -3,9 +3,6 @@ message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Jiaxin Li"
   orcid: "https://orcid.org/0009-0002-7381-8412"
-- family-names: "Lisa"
-  given-names: "Mona"
-  orcid: "https://orcid.org/0000-0000-0000-0000"
 title: "DataFromSky-Drone-Trajectory-Preprocessing"
 version: 1.0.0
 doi: 10.5281/zenodo.1234
